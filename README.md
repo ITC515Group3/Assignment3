@@ -7,6 +7,8 @@ All the case diagrams are provided in Diagrams folder, select at least one for y
 ## How to use source code (Todo:)
 Init a new project using provided java source code.
 
+IF YOU DO NOT KNOW HOW TO USE THE SOURCE CODE, JUST RUN THE jar FILE, Thank you.
+
 ## How to do the test 
 Create your own branch and create and commit your own test class for the case you selected.
 
