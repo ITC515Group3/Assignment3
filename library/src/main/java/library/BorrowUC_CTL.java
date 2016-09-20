@@ -220,4 +220,7 @@ public class BorrowUC_CTL implements ICardReaderListener, IScannerListener, IBor
         }
         return bld.toString();
     }
+
+    public EBorrowState getState() {
+    }
 }
