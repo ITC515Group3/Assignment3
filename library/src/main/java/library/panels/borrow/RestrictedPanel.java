@@ -33,7 +33,7 @@ public class RestrictedPanel extends ABorrowPanel {
 	/**
 	 * Create the panel.
 	 */
-	public RestrictedPanel(IBorrowUIListener listener) {
+	public RestrictedPanel(final IBorrowUIListener listener) {
 		setLayout(null);
 		setBorder(new TitledBorder(null, "Scanning", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setBounds(12, 23, 460, 640);

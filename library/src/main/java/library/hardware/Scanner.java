@@ -38,7 +38,7 @@ public class Scanner extends JFrame implements IScanner {
 		getContentPane().add(panel);
 		panel.setLayout(null);
 		
-		JLabel lblErrorMesg = new JLabel("");
+		final JLabel lblErrorMesg = new JLabel("");
 		lblErrorMesg.setForeground(Color.RED);
 		lblErrorMesg.setBounds(12, 21, 358, 16);
 		panel.add(lblErrorMesg);

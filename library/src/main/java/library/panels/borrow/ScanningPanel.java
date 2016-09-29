@@ -35,7 +35,7 @@ public class ScanningPanel extends ABorrowPanel {
 	/**
 	 * Create the panel.
 	 */
-	public ScanningPanel(IBorrowUIListener listener) {
+	public ScanningPanel(final IBorrowUIListener listener) {
 		setLayout(null);
 		setBorder(new TitledBorder(null, "Scanning", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setBounds(12, 23, 460, 640);
