@@ -1,3 +1,17 @@
+/**
+* This is the test case for the BorrowRestrictedTest Senario. 
+* Five Different Test cases are been tested in this class.
+* Test Cases builded by - Theva & Saidul
+*
+* 	public void testCardSwiped() - Theva
+*	public void testBorrowRestrictedWithFines() - Theva
+*	public void testBorrowRestrictedOverDueLoan() - Theva
+*	public void testBorrowRestrictedWithOverLimit() - Saidul
+*	public void testBorrowMemberDoesNotExist() - Saidul
+*
+* 	This testing is done using JUNIT and MOCKITO.
+*/
+
 package library.tests.integration;
 
 import static org.junit.Assert.*;
@@ -61,8 +75,8 @@ public class BorrowerRestrictedTest
 
 		controlClass = new BorrowUC_CTL(cardReader, scanner, printer, display, bookMapDao, loanMapDao, memberMapDao,ui);
 
-		IBook[] book = new IBook[15];
-		IMember[] member = new IMember[6];
+		IBook[] book = new IBook[15]; // Limited range of books allowed in the system.
+		IMember[] member = new IMember[6]; // Limited range of members allowed in the system.
 
 		book[0]  = bookMapDao.addBook("author1", "title1", "callNumber1");
 		book[1]  = bookMapDao.addBook("author1", "title2", "callNumber2");
@@ -124,7 +138,10 @@ public class BorrowerRestrictedTest
 	    display = null;
 	    ui = null;
 	}
-	
+
+	/**This class will be testing member cardSwiped / check vaild one
+	*  in the library system before lending process starts.
+	*/
 	@Test
 	public void testCardSwiped()
 	{		
@@ -140,6 +157,9 @@ public class BorrowerRestrictedTest
 		assertEquals(EBorrowState.SCANNING_BOOKS, controlClass.getState());
 	}
 
+	/**This class will be testing member restricted with fine
+	*  in the library system before lending process completed.
+	*/
 	@Test
 	public void testBorrowRestrictedWithFines()
 	{
@@ -155,6 +175,9 @@ public class BorrowerRestrictedTest
 		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}
 
+	/**This class will be testing member does exceed the limit lending books
+	*  in the library system before process completed.
+	*/
 	@Test
 	public void testBorrowRestrictedWithOverLimit()
 	{
@@ -170,6 +193,9 @@ public class BorrowerRestrictedTest
 		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}
 
+	/**This class will be testing member does exceed over due payment from the past lended books
+	*  in the library system before lending process completed.
+	*/
 	@Test
 	public void testBorrowRestrictedOverDueLoan()
 	{
@@ -178,13 +204,16 @@ public class BorrowerRestrictedTest
 
 		verify(cardReader).setEnabled(false);
 		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
-		//verify(ui).displayMemberDetails(2, "firstName0 lastName0", "0002");
+		
 		verify(ui).displayOverDueMessage();
 		verify(ui).displayExistingLoan(any(String.class));
 
 		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}
 
+	/**This class will be testing member does existing in the library system 
+	*  before lending process completed
+	*/
 	@Test
 	public void testBorrowMemberDoesNotExist()
 	{
