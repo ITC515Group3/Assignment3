@@ -169,33 +169,4 @@ public class BorrowerRestrictedTest
 
 		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}
-
-	@Test
-	public void testBorrowRestrictedOverDueLoan()
-	{
-		controlClass.setState(EBorrowState.INITIALIZED);
-		controlClass.cardSwiped(2);
-
-		verify(cardReader).setEnabled(false);
-		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
-		//verify(ui).displayMemberDetails(2, "firstName0 lastName0", "0002");
-		verify(ui).displayOverDueMessage();
-		verify(ui).displayExistingLoan(any(String.class));
-
-		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
-	}
-
-	@Test
-	public void testBorrowMemberDoesNotExist()
-	{
-		controlClass.setState(EBorrowState.INITIALIZED);
-		controlClass.cardSwiped(7);
-
-		verify(cardReader).setEnabled(true);
-		verify(scanner).setEnabled(false);
-		verify(ui).setState(EBorrowState.INITIALIZED);
-		verify(ui).displayErrorMessage(any(String.class));
-
-		assertEquals(EBorrowState.INITIALIZED, controlClass.getState());
-	}	
 }
