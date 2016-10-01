@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestHappyDay {
-
+    //mock objects
     @Spy
     private IBookDAO bookDAO = new BookMapDAO(new BookHelper());
     @Spy
@@ -61,16 +61,19 @@ public class TestHappyDay {
     @InjectMocks
     private BorrowUC_CTL sut;
 
+    //before test
     @Before
     public void setUp() throws Exception {
         setUpTestData();
         MockitoAnnotations.initMocks(this);
     }
 
+    //after test
     @After
     public void tearDown() throws Exception {
     }
 
+    //Tests
     @Test
     public void testInit() {
         sut.initialise();
@@ -84,7 +87,7 @@ public class TestHappyDay {
 
     @Test
     public void testHappyDayScenarioBorrowSuccessful() {
-        //1
+        //init program
         sut.initialise();
 
         int borrowerID = 1;
@@ -151,74 +154,83 @@ public class TestHappyDay {
 
     @Test
     public void testHappyDayScenarioBorrowBookNotFound() {
-        //arrange
+        //1 init program
         sut.initialise();
 
         int borrowerID = 1;
         int bookBarcode = 100;
+
+        //9.1
         sut.cardSwiped(borrowerID);
-
+        //9.1.7
         verify(reader).setEnabled(true);
+        //9.1.8
         verify(scanner).setEnabled(false);
-
+        //9.1.9
         verify(ui).setState(EBorrowState.SCANNING_BOOKS);
-
+        //9.1.10
         verify(ui).displayScannedBookDetails("");
+        //9.1.11
         verify(ui).displayPendingLoan("");
+        //9.1.12
         verify(ui).displayMemberDetails(eq(borrowerID), anyString(), anyString());
+        //9.1.15
         verify(ui).displayExistingLoan("");
 
-        // scan a book
+        //10.1 scan a book
         sut.bookScanned(bookBarcode);
+
+        //10.1.1
+        verify(ui).displayErrorMessage("");
+        //10.1.3
+        verify(ui).displayErrorMessage(String.format("Book %d not found", bookBarcode));
 
         verifyScanCount(0);
 
-        // 11.1
-        sut.scansCompleted();
-
-        verify(ui).setState(EBorrowState.CONFIRMING_LOANS);
         verify(reader).setEnabled(true);
         verify(scanner, times(2)).setEnabled(false);
-
-        verify(ui).displayErrorMessage("");
-        verify(ui).displayErrorMessage(String.format("Book %d not found", bookBarcode));
 
         System.out.println("Case: Book Not found\n");
     }
 
     @Test
     public void testHappyDayScenarioBorrowBookNotAvailable() {
-        //arrange
+        //1 init program
         sut.initialise();
 
         int borrowerID = 1;
         int bookBarcode = 1;
+
+        //9.1
         sut.cardSwiped(borrowerID);
+        //9.1.7
+        verify(reader).setEnabled(true);
+        //9.1.8
+        verify(scanner).setEnabled(false);
+        //9.1.9
+        verify(ui).setState(EBorrowState.SCANNING_BOOKS);
+        //9.1.10
+        verify(ui).displayScannedBookDetails("");
+        //9.1.11
+        verify(ui).displayPendingLoan("");
+        //9.1.12
+        verify(ui).displayMemberDetails(eq(borrowerID), anyString(), anyString());
+        //9.1.15
+        verify(ui).displayExistingLoan("");
+
+        //10.1 scan a book
+        sut.bookScanned(bookBarcode);
+
+        //10.1.1
+        verify(ui).displayErrorMessage("");
+        //10.1.5
+        verify(ui).displayErrorMessage(String.format("Book %d is not available: %s", bookBarcode, bookDAO.getBookByID(bookBarcode).getState()));
+
+        verifyScanCount(0);
 
         verify(reader).setEnabled(true);
         verify(scanner).setEnabled(false);
 
-        verify(ui).setState(EBorrowState.SCANNING_BOOKS);
-
-        verify(ui).displayScannedBookDetails("");
-        verify(ui).displayPendingLoan("");
-        verify(ui).displayMemberDetails(eq(borrowerID), anyString(), anyString());
-        verify(ui).displayExistingLoan("");
-
-        // scan a book
-        sut.bookScanned(bookBarcode);
-
-        verifyScanCount(0);
-
-        // 11.1
-        sut.scansCompleted();
-
-        verify(ui).setState(EBorrowState.CONFIRMING_LOANS);
-        verify(reader).setEnabled(true);
-        verify(scanner, times(2)).setEnabled(false);
-
-        verify(ui).displayErrorMessage("");
-        verify(ui).displayErrorMessage(String.format("Book %d is not available: %s", bookBarcode, bookDAO.getBookByID(bookBarcode).getState()));
         System.out.println("Case: Book is Not Available\n");
     }
 
@@ -229,21 +241,28 @@ public class TestHappyDay {
 
         int borrowerID = 1;
         int bookBarcode = 10;
+
+        //9.1
         sut.cardSwiped(borrowerID);
-
+        //9.1.7
         verify(reader).setEnabled(true);
+        //9.1.8
         verify(scanner).setEnabled(false);
-
+        //9.1.9
         verify(ui).setState(EBorrowState.SCANNING_BOOKS);
-
+        //9.1.10
         verify(ui).displayScannedBookDetails("");
+        //9.1.11
         verify(ui).displayPendingLoan("");
+        //9.1.12
         verify(ui).displayMemberDetails(eq(borrowerID), anyString(), anyString());
+        //9.1.15
         verify(ui).displayExistingLoan("");
 
         //10 scan a book
         sut.bookScanned(bookBarcode);
 
+        verify(ui).displayErrorMessage("");
         verifyScanCount(1);
 
         //10 scan again
@@ -251,6 +270,8 @@ public class TestHappyDay {
 
         verify(ui, times(2)).displayErrorMessage("");
         verify(ui).displayErrorMessage(String.format("Book %d already scanned: ", bookBarcode));
+
+        System.out.println("Case: Book already scanned\n");
     }
 
     private void verifyScanCount(int iCount) {
@@ -264,7 +285,9 @@ public class TestHappyDay {
         }
     }
 
+    //objects data init
     private void setUpTestData() {
+        //init books and members
         IBook[] book = new IBook[15];
         IMember[] member = new IMember[6];
 
