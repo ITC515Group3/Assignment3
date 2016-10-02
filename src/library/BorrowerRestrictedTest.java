@@ -25,20 +25,24 @@ import static org.mockito.Matchers.any;
 @RunWith(MockitoJUnitRunner.class)
 public class BorrowerRestrictedTest 
 {
+	//1.1.1
 	private BorrowUC_CTL controlClass;
 	private IBookDAO bookMapDao;
 	private ILoanDAO loanMapDao;
 	private IMemberDAO memberMapDao;
 	
+	//7
 	@Mock
 	private ICardReader cardReader;
 	
+	//8
 	@Mock
 	private IScanner scanner;
 	@Mock
 	private IPrinter printer;
 	@Mock
 	private IDisplay display;
+	//2
 	@Mock
 	private BorrowUC_UI ui;
 	  
@@ -48,7 +52,7 @@ public class BorrowerRestrictedTest
 	
 	@Before
 	public void setUp() throws Exception
-	{
+	{	//9
 		cardReader = mock(CardReader.class);
 		scanner = mock(IScanner.class);
 		printer = mock(IPrinter.class);
@@ -125,6 +129,7 @@ public class BorrowerRestrictedTest
 	    ui = null;
 	}
 	
+	//9
 	@Test
 	public void testCardSwiped()
 	{		
@@ -140,58 +145,76 @@ public class BorrowerRestrictedTest
 		assertEquals(EBorrowState.SCANNING_BOOKS, controlClass.getState());
 	}
 
+	//9.1.12 to 9.1.12.1
 	@Test
 	public void testBorrowRestrictedWithFines()
 	{
+		//9.1
 		controlClass.setState(EBorrowState.INITIALIZED);
 		controlClass.cardSwiped(3);
 
 		verify(cardReader).setEnabled(false);
+		//9.1.1
 		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
 		verify(ui).displayMemberDetails(3, "firstName2 lastName2", "0003");
+		//9.1.12
 		verify(ui).displayOutstandingFineMessage(10.0f);
+		//9.1.14
 		verify(ui).displayOverFineLimitMessage(10.0f);  
-
+		//9.1.9
 		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}
 
+	//9.1.14 to 9.1.14.1
 	@Test
 	public void testBorrowRestrictedWithOverLimit()
 	{
+		//9.1
 		controlClass.setState(EBorrowState.INITIALIZED);
 		controlClass.cardSwiped(4);
-
+		
 		verify(cardReader).setEnabled(false);
+		//9.1.1
 		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
 		verify(ui).displayMemberDetails(4, "firstName3 lastName3", "0004");
+		//9.1.14
 		verify(ui).displayAtLoanLimitMessage();
+		//9.1.15
 		verify(ui).displayExistingLoan(any(String.class));
-
+		//9.1.9
 		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}
 
+	//9.1.13 to 9.1.13.1 
 	@Test
 	public void testBorrowRestrictedOverDueLoan()
 	{
+		//9.1
 		controlClass.setState(EBorrowState.INITIALIZED);
 		controlClass.cardSwiped(2);
 
 		verify(cardReader).setEnabled(false);
+		//9.1.1
 		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
 		//verify(ui).displayMemberDetails(2, "firstName0 lastName0", "0002");
-		verify(ui).displayOverDueMessage();
+		//9.1.11
 		verify(ui).displayExistingLoan(any(String.class));
-
+		//9.1.11.1
+		verify(ui).displayOverDueMessage();
+		//9.1.9
 		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}
 
+	//9.1.1
 	@Test
 	public void testBorrowMemberDoesNotExist()
 	{
+		//9.1
 		controlClass.setState(EBorrowState.INITIALIZED);
 		controlClass.cardSwiped(7);
 
 		verify(cardReader).setEnabled(true);
+		//9.1.1
 		verify(scanner).setEnabled(false);
 		verify(ui).setState(EBorrowState.INITIALIZED);
 		verify(ui).displayErrorMessage(any(String.class));
