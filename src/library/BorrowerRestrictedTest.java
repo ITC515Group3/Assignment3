@@ -1,3 +1,4 @@
+
 /**
 * This is the test case for the BorrowRestrictedTest Senario. 
 * Five Different Test cases are been tested in this class.
@@ -11,7 +12,6 @@
 *
 * 	This testing is done using JUNIT and MOCKITO.
 */
-
 package library.tests.integration;
 
 import static org.junit.Assert.*;
@@ -39,20 +39,24 @@ import static org.mockito.Matchers.any;
 @RunWith(MockitoJUnitRunner.class)
 public class BorrowerRestrictedTest 
 {
+	//1.1.1
 	private BorrowUC_CTL controlClass;
 	private IBookDAO bookMapDao;
 	private ILoanDAO loanMapDao;
 	private IMemberDAO memberMapDao;
 	
+	//7
 	@Mock
 	private ICardReader cardReader;
 	
+	//8
 	@Mock
 	private IScanner scanner;
 	@Mock
 	private IPrinter printer;
 	@Mock
 	private IDisplay display;
+	//2
 	@Mock
 	private BorrowUC_UI ui;
 	  
@@ -75,8 +79,8 @@ public class BorrowerRestrictedTest
 
 		controlClass = new BorrowUC_CTL(cardReader, scanner, printer, display, bookMapDao, loanMapDao, memberMapDao,ui);
 
-		IBook[] book = new IBook[15]; // Limited range of books allowed in the system.
-		IMember[] member = new IMember[6]; // Limited range of members allowed in the system.
+		IBook[] book = new IBook[15];
+		IMember[] member = new IMember[6];
 
 		book[0]  = bookMapDao.addBook("author1", "title1", "callNumber1");
 		book[1]  = bookMapDao.addBook("author1", "title2", "callNumber2");
@@ -139,9 +143,11 @@ public class BorrowerRestrictedTest
 	    ui = null;
 	}
 
-	/**This class will be testing member cardSwiped / check vaild one
-	*  in the library system before lending process starts.
-	*/
+	/**
+	 * This class will be testing member cardSwiped / check vaild one
+	 *  in the library system before lending process starts.
+	 */
+	//9
 	@Test
 	public void testCardSwiped()
 	{		
@@ -157,78 +163,96 @@ public class BorrowerRestrictedTest
 		assertEquals(EBorrowState.SCANNING_BOOKS, controlClass.getState());
 	}
 
-	/**This class will be testing member restricted with fine
-	*  in the library system before lending process completed.
-	*/
+	//9.1.12 to 9.1.12.1
+	/**
+	 * This class will be testing member restricted with fine
+	 * in the library system before lending process completed.
+	 */
+	@Test
+	public void testBorrowRestrictedWithFines()
+	{
+		//9.1
+		controlClass.setState(EBorrowState.INITIALIZED);
+		controlClass.cardSwiped(3);
+
+		verify(cardReader).setEnabled(false);
+		//9.1.1
+		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
+		verify(ui).displayMemberDetails(3, "firstName2 lastName2", "0003");
+		//9.1.12
+		verify(ui).displayOutstandingFineMessage(10.0f);
+		//9.1.14
+		verify(ui).displayOverFineLimitMessage(10.0f);  
+		//9.1.9
+		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
+	}
+
+	//9.1.14 to 9.1.14.1
+	/**
+	 * This class will be testing member does exceed the limit lending books
+	 * in the library system before process completed.
+	 */
+	@Test
+	public void testBorrowRestrictedWithOverLimit()
+	{
+		//9.1
+		controlClass.setState(EBorrowState.INITIALIZED);
+		controlClass.cardSwiped(4);
+		
+		verify(cardReader).setEnabled(false);
+		//9.1.1
+		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
+		verify(ui).displayMemberDetails(4, "firstName3 lastName3", "0004");
+		//9.1.14
+		verify(ui).displayAtLoanLimitMessage();
+		//9.1.15
+		verify(ui).displayExistingLoan(any(String.class));
+		//9.1.9
+		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
+	}
+
+	//9.1.13 to 9.1.13.1 
+	/**
+	 * This class will be testing member does exceed over due payment from the past lended books
+	 * in the library system before lending process completed.
+	 */
 	@Test
 	public void testBorrowRestrictedOverDueLoan()
 	{
+		//9.1
 		controlClass.setState(EBorrowState.INITIALIZED);
 		controlClass.cardSwiped(2);
 
 		verify(cardReader).setEnabled(false);
+		//9.1.1
 		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
 		//verify(ui).displayMemberDetails(2, "firstName0 lastName0", "0002");
-		verify(ui).displayOverDueMessage();
+		//9.1.11
 		verify(ui).displayExistingLoan(any(String.class));
-
+		//9.1.11.1
+		verify(ui).displayOverDueMessage();
+		//9.1.9
 		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}
 
-	/**This class will be testing member does exceed the limit lending books
-	*  in the library system before process completed.
-	*/
+	//9.1.1
+	/**
+	 * This class will be testing member does existing in the library system 
+	 * before lending process completed
+	 */
 	@Test
 	public void testBorrowMemberDoesNotExist()
 	{
+		//9.1
 		controlClass.setState(EBorrowState.INITIALIZED);
 		controlClass.cardSwiped(7);
 
 		verify(cardReader).setEnabled(true);
+		//9.1.1
 		verify(scanner).setEnabled(false);
 		verify(ui).setState(EBorrowState.INITIALIZED);
 		verify(ui).displayErrorMessage(any(String.class));
 
 		assertEquals(EBorrowState.INITIALIZED, controlClass.getState());
-	}
-
-	/**This class will be testing member does exceed over due payment from the past lended books
-	*  in the library system before lending process completed.
-	*/
-	@Test
-	public void testBorrowRestrictedWithFines()
-	{
-		controlClass.setState(EBorrowState.INITIALIZED);
-		controlClass.cardSwiped(3);
-
-		verify(cardReader).setEnabled(false);
-		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
-
-		verify(ui).displayMemberDetails(3, "firstName2 lastName2", "0003");
-		verify(ui).displayOutstandingFineMessage(10.0f);
-		verify(ui).displayOverFineLimitMessage(10.0f);  
-		
-		verify(ui).displayOverDueMessage();
-		verify(ui).displayExistingLoan(any(String.class));
-
-		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
-	}
-
-	/**This class will be testing member does existing in the library system 
-	*  before lending process completed
-	*/
-	@Test
-	public void testBorrowRestrictedWithOverLimit()
-	{
-		controlClass.setState(EBorrowState.INITIALIZED);
-		controlClass.cardSwiped(4);
-
-		verify(cardReader).setEnabled(false);
-		verify(ui).setState(EBorrowState.BORROWING_RESTRICTED);
-		verify(ui).displayMemberDetails(4, "firstName3 lastName3", "0004");
-		verify(ui).displayAtLoanLimitMessage();
-		verify(ui).displayExistingLoan(any(String.class));
-
-		assertEquals(EBorrowState.BORROWING_RESTRICTED, controlClass.getState());
 	}	
 }
